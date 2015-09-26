@@ -50,7 +50,10 @@ def query_db(query, args=(), one=False):
     :param one: Return only one result (default: False)
     :return: dict of args
     """
-    current = get_db().execute(query, args)
+    try:
+        current = get_db().execute(query, args)
+    except sqlite3.OperationalError:
+        return None
     rv = current.fetchall()
     current.close()
     if one:
