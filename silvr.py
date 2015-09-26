@@ -18,6 +18,24 @@ def init_db():
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
+@app.before_request
+def before_request():
+    """
+    Connects to the database for the request.
+    """
+    g.db = connect_db()
+
+@app.teardown_request
+def teardown_request(exception):
+    """
+    Disconnect from the database.
+    :param exception:
+    :return:
+    """
+    database = getattr(g, 'db', None)
+    if database is not None:
+            database.close()
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
