@@ -3,6 +3,7 @@ import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing  # For init.ing database
+import time
 
 app = Flask(__name__.split('.')[0])
 app.config.from_object('config')  # Import configuration data
@@ -97,7 +98,7 @@ def show_entries():
     Display all stored entries.
     :return: Rendered template.
     """
-    entries = query_db("select title, text from entries")
+    entries = query_db("select title, text, posted from entries")
     if entries is not None:
         return render_template('show_entries.html', entries=entries)
     else:
@@ -111,8 +112,9 @@ def add_entry():
     """
     if not session.get('logged_in'):
         abort(401) # Unauthorized
-    query_db('insert into entries (title, text) values (?, ?)', [request.form['title'],\
-                                                                 request.form['text']])
+    query_db('insert into entries (title, text, posted) values (?, ?, ?)', [request.form['title'],
+                                                                         request.form['text'],
+                                                                         str(time.strftime("%Y/%m/%d %H:%M:%S"))])
     commit_db()
     flash('New entry was successfully posted!')
     return redirect(url_for('show_entries'))  # Redirect the user to see some requests
