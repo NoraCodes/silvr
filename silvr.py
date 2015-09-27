@@ -139,6 +139,17 @@ def login():
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
+@app.route("/new_post")
+def new_post():
+    """
+    The form for submitting new posts.
+    :return:
+    """
+    if session.get('logged_in'):
+        return render_template("new_post.html")
+    else:
+        abort(401) # Unauthorized
+
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
