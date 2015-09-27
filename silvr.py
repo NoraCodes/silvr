@@ -99,6 +99,9 @@ def show_entries():
     :return: Rendered template.
     """
     entries = query_db("select id, title, text, posted from entries")
+    if app.config['LATEST_FIRST']:
+        # Reverse the entries list so that the latest entries are first
+        entries = list(reversed(entries))  # Reversed returns an iterable so we need to make it a list
     if entries is not None:
         return render_template('show_entries.html', entries=entries)
     else:
