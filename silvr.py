@@ -4,7 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing  # For init.ing database
 
-app = Flask(__name__)
+app = Flask(__name__.split('.')[0])
 app.config.from_object('config')  # Import configuration data
 
 
@@ -70,6 +70,7 @@ def commit_db():
     get_db().commit()
 
 
+
 @app.before_request
 def before_request():
     """
@@ -98,9 +99,9 @@ def show_entries():
     """
     entries = query_db("select title, text from entries")
     if entries is not None:
-        return render_template('show_entries', entries=entries)
+        return render_template('show_entries.html', entries=entries)
     else:
-        return "No entries in database."
+        return render_template('show_entries.html')
 
 
 @app.route('/add', methods=['POST'])
