@@ -98,7 +98,7 @@ def show_entries():
     Display all stored entries.
     :return: Rendered template.
     """
-    entries = query_db("select title, text, posted from entries")
+    entries = query_db("select id, title, text, posted from entries")
     if entries is not None:
         return render_template('show_entries.html', entries=entries)
     else:
@@ -111,7 +111,7 @@ def add_entry():
     Add an entry to the list of entries.
     """
     if not session.get('logged_in'):
-        abort(401) # Unauthorized
+        abort(401)  # Unauthorized
     query_db('insert into entries (title, text, posted) values (?, ?, ?)', [request.form['title'],
                                                                          request.form['text'],
                                                                          str(time.strftime("%Y/%m/%d %H:%M:%S"))])
@@ -119,6 +119,21 @@ def add_entry():
     flash('New entry was successfully posted!')
     return redirect(url_for('show_entries'))  # Redirect the user to see some requests
 
+@app.route('/del/<int:entry_id>')
+def del_entry(entry_id):
+    """
+    Remove a post, if logged in.
+    :param entry_id: The ID of the post to remove.
+    :return:
+    """
+    if not session.get('logged_in'):
+        abort('401')  # Unauthorized
+    else:
+        # Person is logged in
+        query_db('delete from entries where id == ?', [entry_id])
+        commit_db()
+        flash("Deletion successful!")
+    return redirect(url_for("show_entries"))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
