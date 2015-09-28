@@ -3,6 +3,9 @@
   <ul class=entries>
   {% for entry in entries %}
     <li><h2>{{ entry.title }}</h2><h4>{{ entry.posted }}
+        {% if entry.category %}
+            in <a href="{{ url_for('view_category', category = entry.category) }}">{{ entry.category }}</a>.
+        {% endif %}
         {% if session.logged_in %}
             <a href="{{ url_for('del_entry', entry_id = entry.id) }}"> Delete </a>
         {% endif %}

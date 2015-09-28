@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+{% if session.logged_in %}
+    <form action="{{ url_for('add_category') }}" method=post class=add-entry>
+      <dl>
+        <dt>Category Name:
+        <dd><input type=text size=30 name=name>
+        <dt>Description:
+        <dd><textarea name=text rows=5 cols=40></textarea>
+        <dd><input type=submit value='Add Category'>
+      </dl>
+    </form>
+    {% else %}
+    You do not appear to be logged in.
+  {% endif %}
+{% endblock %}

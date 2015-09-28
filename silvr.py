@@ -108,7 +108,7 @@ def show_entries():
     Display all stored entries.
     :return: Rendered template.
     """
-    entries = query_db("select id, title, text, posted from entries")
+    entries = query_db('select id, title, text, posted, category from entries')
     if app.config['LATEST_FIRST']:
         # Reverse the entries list so that the latest entries are first
         entries = list(reversed(entries))  # Reversed returns an iterable so we need to make it a list
@@ -125,12 +125,27 @@ def add_entry():
     """
     if not session.get('logged_in'):
         abort(401)  # Unauthorized
-    query_db('insert into entries (title, text, posted) values (?, ?, ?)', [request.form['title'],
+    query_db('insert into entries (title, text, posted, category) values (?, ?, ?, ?)', [request.form['title'],
                                                                          request.form['text'],
-                                                                         str(time.strftime("%Y/%m/%d %H:%M:%S"))])
+                                                                         str(time.strftime("%Y/%m/%d %H:%M:%S")),
+                                                                         request.form['category']])
     commit_db()
     flash('New entry was successfully posted!')
     return redirect(url_for('show_entries'))  # Redirect the user to see some requests
+
+@app.route('/add_category', methods=['POST'])
+def add_category():
+    """
+    Add an entry to the list of entries.
+    """
+    if not session.get('logged_in'):
+        abort(401)  # Unauthorized
+    query_db('insert into categories (category, description) values (?, ?)', [request.form['name'],
+                                                                         request.form['text']])
+    commit_db()
+    flash('New category was successfully added!')
+    return redirect(url_for('new_post'))  # Redirect the user to see some requests
+
 
 @app.route('/del/<int:entry_id>')
 def del_entry(entry_id):
@@ -175,11 +190,40 @@ def new_post():
     The form for submitting new posts.
     :return:
     """
+    categories = query_db("select category from categories")
     if session.get('logged_in'):
-        return render_template("new_post.html")
+        return render_template("new_post.html", categories=categories)
     else:
         abort(401) # Unauthorized
 
+
+@app.route("/new_category")
+def new_category():
+    """
+    The form for submitting new categories.
+    :return:
+    """
+    if session.get('logged_in'):
+        return render_template("new_category.html")
+    else:
+        abort(401) # Unauthorized
+
+
+@app.route('/view_category/<category>')
+def view_category(category):
+    """
+    List the entries in a category
+    :param category: The category to list
+    :return:
+    """
+    entries = query_db("select id, title, text, posted, category from entries WHERE category == (?)", [category])
+    if app.config['LATEST_FIRST_IN_CATEGORIES']:
+        # Reverse the entries list so that the latest entries are first
+        entries = list(reversed(entries))  # Reversed returns an iterable so we need to make it a list
+    if entries is not None:
+        return render_template('show_entries.html', entries=entries)
+    else:
+        return render_template('show_entries.html')
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():

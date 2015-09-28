@@ -5,6 +5,13 @@
       <dl>
         <dt>Title:
         <dd><input type=text size=30 name=title>
+        <dt>Category:
+        <dd><select name="category">
+            <option value="">No Category</option>
+          {% for category in categories %}
+            <option value="{{ category.category }}">{{ category.category }}</option>
+          {% endfor %}
+        </select> <a href = {{ url_for('new_category') }}> Create Category </a>
         <dt>Text:
         <dd><textarea name=text rows=5 cols=40></textarea>
         <dd><input type=submit value=Share>
