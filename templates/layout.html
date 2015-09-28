@@ -2,7 +2,7 @@
 <title>{{ title }}</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
-  <h1>{{ title }}</h1>
+  <h1><a href = "{{ url_for("show_entries") }}" style="text-decoration: none">{{ title }}</a></h1>
   <div class=metanav>
   {% for (uri, display_name) in navbar %}
       <a href="{{ uri }}">{{ display_name }}</a> |
