@@ -4,6 +4,9 @@
 <div class=page>
   <h1>Silvr</h1>
   <div class=metanav>
+  {% for (uri, display_name) in navbar %}
+      <a href="{{ uri }}">{{ display_name }}</a> |
+  {% endfor %}
   {% if not session.logged_in %}
     <a href="{{ url_for('login') }}">Log In</a>
   {% else %}
