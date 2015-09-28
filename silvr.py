@@ -92,13 +92,15 @@ def teardown_request(exception):
             database.close()
 
 @app.context_processor
-def inject_navbar():
+def inject_config():
     """
-    Inject the navigation bar extras
+    Inject the configuration
     """
-    navbar=app.config['NAVBAR_ADDL']
-    if navbar is not None and navbar is not '':
-        return dict(navbar=app.config['NAVBAR_ADDL'])
+    navbar = app.config['NAVBAR_ADDL']
+    title = app.config['TITLE']
+    copyright = app.config['COPYRIGHT']
+    return dict(navbar=navbar, title=title, copyright=copyright)
+
 
 @app.route('/')
 def show_entries():

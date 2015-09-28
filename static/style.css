@@ -18,3 +18,4 @@ h4 a            { font-style: normal }
 .flash          { background: #cee5F5; padding: 0.5em;
                   border: 1px solid #aacbe2; }
 .error          { background: #f0d6d6; padding: 0.5em; }
+.footer         { font-size: small; font-style: italic; text-align: center;}

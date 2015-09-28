@@ -1,8 +1,8 @@
 <!doctype html>
-<title>Silvr</title>
+<title>{{ title }}</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
-  <h1>Silvr</h1>
+  <h1>{{ title }}</h1>
   <div class=metanav>
   {% for (uri, display_name) in navbar %}
       <a href="{{ uri }}">{{ display_name }}</a> |
@@ -19,3 +19,4 @@
   {% endfor %}
   {% block body %}{% endblock %}
 </div>
+<div class="footer">{{ copyright }}</div>
