@@ -127,7 +127,7 @@ def add_entry():
         abort(401)  # Unauthorized
     query_db('insert into entries (title, text, posted, category) values (?, ?, ?, ?)', [request.form['title'],
                                                                          request.form['text'],
-                                                                         str(time.strftime("%Y/%m/%d %H:%M:%S")),
+                                                                         str(time.strftime(app.config['DATETIME'])),
                                                                          request.form['category']])
     commit_db()
     flash('New entry was successfully posted!')

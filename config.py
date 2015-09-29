@@ -12,4 +12,5 @@ COPYRIGHT = 'Copyright (C) Leo Tindall 2015'
 
 LATEST_FIRST = True  # If True, display the latest posts first; if False, displays in chronological order
 LATEST_FIRST_IN_CATEGORIES = LATEST_FIRST  # Same as above for results in /category/* pages
+DATETIME = "%Y/%m/%d %H:%M:%S" # The datetime format string for new entries. Default: yyyy/mm/dd hh:mm:ss
 NAVBAR_ADDL = [('http://silverwingedseraph.net', 'Main Site')]  # List of tuples of (URI, display name) to be added to the navbar
