@@ -71,7 +71,6 @@ def commit_db():
     get_db().commit()
 
 
-
 @app.before_request
 def before_request():
     """
@@ -133,6 +132,7 @@ def add_entry():
     flash('New entry was successfully posted!')
     return redirect(url_for('show_entries'))  # Redirect the user to see some requests
 
+
 @app.route('/add_category', methods=['POST'])
 def add_category():
     """
@@ -163,6 +163,7 @@ def del_entry(entry_id):
         flash("Deletion successful!")
     return redirect(url_for('show_entries'))
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -184,6 +185,7 @@ def login():
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
+
 @app.route("/new_post")
 def new_post():
     """
@@ -195,6 +197,7 @@ def new_post():
         return render_template("new_post.html", categories=categories)
     else:
         abort(401) # Unauthorized
+
 
 @app.route("/new_category")
 def new_category():
@@ -233,6 +236,7 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out.')
     return redirect(url_for('show_entries'))
+
 
 @app.route('/favicon.ico')
 def favicon_redirect():
