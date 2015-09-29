@@ -155,13 +155,13 @@ def del_entry(entry_id):
     :return:
     """
     if not session.get('logged_in'):
-        abort('401')  # Unauthorized
+        abort(401)  # Unauthorized
     else:
         # Person is logged in
         query_db('delete from entries where id == ?', [entry_id])
         commit_db()
         flash("Deletion successful!")
-    return redirect(url_for("show_entries"))
+    return redirect(url_for('show_entries'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
