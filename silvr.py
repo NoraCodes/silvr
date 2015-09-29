@@ -166,7 +166,7 @@ def del_entry(entry_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Log the user in, of xir credentials are correct
+    Log the user in, if xir credentials are correct
     :return:
     """
     error = None
@@ -195,7 +195,6 @@ def new_post():
         return render_template("new_post.html", categories=categories)
     else:
         abort(401) # Unauthorized
-
 
 @app.route("/new_category")
 def new_category():
