@@ -174,9 +174,9 @@ def login():
         # TODO: Make this not leak info
         # TODO: Use hashed passwords
         if request.form['username'] != app.config['USERNAME']:
-            error = "Invalid Username"
-        if request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid Password'
+            error = "Invalid Credentials"
+        elif request.form['password'] != app.config['PASSWORD']:
+            error = 'Invalid Credentials'
         else:
             # At this point, we're successfully validated.
             session['logged_in'] = True
