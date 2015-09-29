@@ -3,6 +3,7 @@ import os
 import silvr
 import unittest
 import tempfile
+import time
 
 class SilvrTestCase(unittest.TestCase):
 
@@ -15,6 +16,9 @@ class SilvrTestCase(unittest.TestCase):
         self.app = silvr.app.test_client()
         # Now, init the database. This is safe because the DATABASE config key is now pointing to a temporary DB
         silvr.init_db()
+        # Now look up and remember out creds
+        self.username = silvr.app.config['USERNAME']
+        self.password = silvr.app.config['PASSWORD']
 
     def tearDown(self):
         # Close and unlink the database
@@ -27,6 +31,34 @@ class SilvrTestCase(unittest.TestCase):
          password=password
         ), follow_redirects=True)
 
+    def new_entry(self, title, text, category=None):
+        """
+        Make a POST request to create a new entry
+        :param title: The title for the post.
+        :param text: The text for the body of the post.
+        :param category: The category into which we want to add the post.
+        :return: The time that the POST request was sent.
+        """
+        self.app.post('/add', data=dict(
+            title=title,
+            text=text,
+            category=category
+        ), follow_redirects = True)
+        return str(time.strftime(silvr.app.config['DATETIME']))
+
+    def new_category(self, name, text):
+        """
+        Make a POST request to create a new category
+        :param name: The name for the category
+        :param text: The text for the description of the category
+        :return: None
+        """
+        self.app.post('/add_category', data=dict(
+            name=name,
+            text=text,
+        ), follow_redirects = True)
+        return str(time.strftime(silvr.app.config['DATETIME']))
+
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
 
@@ -35,9 +67,8 @@ class SilvrTestCase(unittest.TestCase):
         Get the username and password values from the config file and try logging in with them and variants
         :return:
         """
-        # Get the username and password from the database. This means that the tests will pass, even in production.
-        username = silvr.app.config['USERNAME']
-        password = silvr.app.config['PASSWORD']
+        username = self.username
+        password = self.password
         # Now, try logging in.
         rv = self.login(username, password)
         assert 'You are now logged in.' in str(rv.data)
@@ -63,12 +94,48 @@ class SilvrTestCase(unittest.TestCase):
         rv = self.app.get('/')
         assert "No posts so far." in str(rv.data)
 
+    def test_categories_add_requires_login(self):
+        """
+        Make sure adding a new category doesn't work if not logged in
+        :return:
+        """
+        self.new_category(b'Category2', b'Description')
+        rv = self.app.get("/new_post")
+        assert '<option value="Category">Category</option>' not in str(rv.data)
+
+    def test_categories_add(self):
+        """
+        Make sure adding a new category works and actually adds it to the database
+        :return:
+        """
+        self.login(self.username, self.password)
+        self.new_category(b'Category', b'Description')
+        rv = self.app.get("/new_post")
+        assert '<option value="Category">Category</option>' in str(rv.data)
+        self.logout()
+
+    def test_entries_add_requires_login(self):
+        """
+        Make sure that the /add endpoint does NOT add posts when the user is not logged in
+        :return:
+        """
+        datetime = self.new_entry(b'<Title2>', b'<i>Text</i>', category=b'Category')
+        rv = self.app.get("/")
+        assert "<h2>&lt;Title&gt;</h2>" not in str(rv.data)
 
     def test_entries_add(self):
         """
         Make sure that the /add endpoint actually adds an entry based on its POST values
         :return:
         """
+        self.login(self.username, self.password)
+        datetime = self.new_entry(b'<Title>', b'<i>Text</i>', category=b'Category')
+        rv = self.app.get("/")
+        assert "<h2>&lt;Title&gt;</h2>" in str(rv.data) # Angle brackets replaced!
+        assert "<i>Text</i>" in str(rv.data) # Angle brackets NOT replaced. HTML is allowed in posts.
+        assert datetime in str(rv.data) # The post should be made with the right date
+        self.logout()
+
 
 
 
