@@ -99,7 +99,7 @@ class SilvrTestCase(unittest.TestCase):
         Make sure adding a new category doesn't work if not logged in
         :return:
         """
-        self.new_category(b'Category2', b'Description')
+        self.new_category('Category2', 'Description')
         rv = self.app.get("/new_post")
         assert '<option value="Category">Category</option>' not in str(rv.data)
 
@@ -109,7 +109,7 @@ class SilvrTestCase(unittest.TestCase):
         :return:
         """
         self.login(self.username, self.password)
-        self.new_category(b'Category', b'Description')
+        self.new_category('Category', 'Description')
         rv = self.app.get("/new_post")
         assert '<option value="Category">Category</option>' in str(rv.data)
         self.logout()
@@ -119,7 +119,7 @@ class SilvrTestCase(unittest.TestCase):
         Make sure that the /add endpoint does NOT add posts when the user is not logged in
         :return:
         """
-        datetime = self.new_entry(b'<Title2>', b'<i>Text</i>', category=b'Category')
+        datetime = self.new_entry('<Title2>', '<i>Text</i>', category='Category')
         rv = self.app.get("/")
         assert "<h2>&lt;Title&gt;</h2>" not in str(rv.data)
 
@@ -129,13 +129,46 @@ class SilvrTestCase(unittest.TestCase):
         :return:
         """
         self.login(self.username, self.password)
-        datetime = self.new_entry(b'<Title>', b'<i>Text</i>', category=b'Category')
+        datetime = self.new_entry('<Title>', '<i>Text</i>', category='Category')
         rv = self.app.get("/")
         assert "<h2>&lt;Title&gt;</h2>" in str(rv.data) # Angle brackets replaced!
         assert "<i>Text</i>" in str(rv.data) # Angle brackets NOT replaced. HTML is allowed in posts.
         assert datetime in str(rv.data) # The post should be made with the right date
         self.logout()
 
+    def test_entries_delete_requires_login(self):
+        """
+        Ensure that deleting a post requires login
+        :return:
+        """
+        silvr.init_db()  # Clear the database
+
+        # Login and make a new post
+        self.login(self.username, self.password)
+        self.new_entry('DeleteMe', 'Text', category='Category')
+        # Now logout BEFORE deletion
+        self.logout()
+        rv = self.app.get('/del/1')
+        assert "Unauthorized" in str(rv.data) # We were rejected when trying to delete the post
+        rv = self.app.get('/')
+        assert "DeleteMe" in str(rv.data) # The post is still there
+
+    def test_entries_delete(self):
+        """
+        Ensure that deleting a post deletes the post
+        :return:
+        """
+        silvr.init_db()  # Clear the database
+
+        # Login and make a new post
+        self.login(self.username, self.password)
+        self.new_entry('DeleteMe', 'Text', category='Category')
+        # Try to delete the post
+        rv = self.app.get('/del/1')
+        # Now logout AFTER deletion
+        self.logout()
+        rv = self.app.get('/')
+        assert "DeleteMe" not in str(rv.data) # The post isn't still there
 
 
 
