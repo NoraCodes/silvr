@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing  # For init.ing database
 import time
+import logging
 
 app = Flask(__name__.split('.')[0])
 app.config.from_object('config')  # Import configuration data
@@ -68,6 +69,7 @@ def commit_db():
     Commit the database.
     :return: None
     """
+    logging.debug("Committing database.")
     get_db().commit()
 
 
@@ -76,6 +78,7 @@ def before_request():
     """
     Connects to the database for the request.
     """
+    logging.debug("Connecting database.")
     g.db = connect_db()
 
 
@@ -88,6 +91,7 @@ def teardown_request(exception):
     """
     database = getattr(g, 'db', None)
     if database is not None:
+            logging.debug("Disconnecting database.")
             database.close()
 
 @app.context_processor
@@ -112,8 +116,10 @@ def show_entries():
         # Reverse the entries list so that the latest entries are first
         entries = list(reversed(entries))  # Reversed returns an iterable so we need to make it a list
     if entries is not None:
+        logging.debug("Listed entries from database.")
         return render_template('show_entries.html', entries=entries)
     else:
+        logging.debug("No entries in database.")
         return render_template('show_entries.html')
 
 
@@ -123,6 +129,7 @@ def add_entry():
     Add an entry to the list of entries.
     """
     if not session.get('logged_in'):
+        logging.info("Unauthorized attempt to add a post.")
         abort(401)  # Unauthorized
     query_db('insert into entries (title, text, posted, category) values (?, ?, ?, ?)', [request.form['title'],
                                                                          request.form['text'],
@@ -130,6 +137,7 @@ def add_entry():
                                                                          request.form['category']])
     commit_db()
     flash('New entry was successfully posted!')
+    logging.debug("Successfully added an entry.")
     return redirect(url_for('show_entries'))  # Redirect the user to see some requests
 
 
@@ -141,6 +149,7 @@ def edit_entry(entry_id):
     """
     if request.method == 'POST': # We're accepting data as a form processor
         if not session.get('logged_in'):
+            logging.info("Unauthorized attempt to edit a post.")
             abort(401)  # Unauthorized
         query_db('update entries set title = ?, text = ?, posted = ?, category = ? where id = ?', [request.form['title'],
                                                                                                    request.form['text'],
@@ -149,9 +158,11 @@ def edit_entry(entry_id):
                                                                                                    entry_id])
         commit_db()
         flash('Entry was successfully updated!')
+        logging.debug("Successfully edited an entry.")
         return redirect(url_for('show_entries'))  # Redirect the user to see some entries
     else:
         if not session.get('logged_in'):
+            logging.info("Unauthorized attempt to edit a post.")
             abort(401)  # Unauthorized
         entry = query_db("select id, title, text, category from entries where id==?", [entry_id])
         return render_template('new_post.html', entry=dict(entry[0]))
@@ -163,6 +174,7 @@ def add_category():
     Add an entry to the list of entries.
     """
     if not session.get('logged_in'):
+        logging.info("Unauthorized attempt to add a category.")
         abort(401)  # Unauthorized
     query_db('insert into categories (category, description) values (?, ?)', [request.form['name'],
                                                                          request.form['text']])
@@ -179,6 +191,7 @@ def del_entry(entry_id):
     :return:
     """
     if not session.get('logged_in'):
+        logging.info("Unauthorized attempt to delete a post.")
         abort(401)  # Unauthorized
     else:
         # Person is logged in
@@ -196,16 +209,18 @@ def login():
     """
     error = None
     if request.method == 'POST':
-        # TODO: Make this not leak info
         # TODO: Use hashed passwords
         if request.form['username'] != app.config['USERNAME']:
+            logging.info("Attempted login with invalid username.")
             error = "Invalid Credentials"
         elif request.form['password'] != app.config['PASSWORD']:
+            logging.info("Attempted login with invalid password.")
             error = 'Invalid Credentials'
         else:
             # At this point, we're successfully validated.
             session['logged_in'] = True
             flash('You are now logged in.')
+            logging.info("User successfully logged in.")
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
@@ -220,7 +235,9 @@ def new_post():
     if session.get('logged_in'):
         return render_template("new_post.html", categories=categories, entry = dict(id=0, text='', title='', category=''))
     else:
+        logging.info("Unauthorized attempt to add a post.")
         abort(401) # Unauthorized
+
 
 
 @app.route("/new_category")
@@ -232,6 +249,7 @@ def new_category():
     if session.get('logged_in'):
         return render_template("new_category.html")
     else:
+        logging.info("Unauthorized attempt to add a post.")
         abort(401) # Unauthorized
 
 
@@ -259,6 +277,7 @@ def logout():
     """
     session.pop('logged_in', None)
     flash('You were logged out.')
+    logging.info("User logged out.")
     return redirect(url_for('show_entries'))
 
 
@@ -271,6 +290,10 @@ def favicon_redirect():
     return redirect(url_for('static', filename='favicon.ico'))
 
 if __name__ == '__main__':
+    # Set up logging
+    logging.basicConfig(level=app.config["LOGLEVEL"],
+                        format='%(asctime)-15s %(levelname)-8s %(message)s')
+    # Now run
     app.run()
 
 
