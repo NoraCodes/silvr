@@ -133,6 +133,31 @@ def add_entry():
     return redirect(url_for('show_entries'))  # Redirect the user to see some requests
 
 
+@app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
+def edit_entry(entry_id):
+    """
+    Add an entry to the list of entries.
+    :param entry_id: the ID of the post to update
+    """
+    if request.method == 'POST': # We're accepting data as a form processor
+        if not session.get('logged_in'):
+            abort(401)  # Unauthorized
+        query_db('update entries set title = ?, text = ?, posted = ?, category = ? where id = ?', [request.form['title'],
+                                                                                                   request.form['text'],
+                                                                                                   str(time.strftime(app.config['DATETIME'])),
+                                                                                                   request.form['category'],
+                                                                                                   entry_id])
+        commit_db()
+        flash('Entry was successfully updated!')
+        return redirect(url_for('show_entries'))  # Redirect the user to see some entries
+    else:
+        if not session.get('logged_in'):
+            abort(401)  # Unauthorized
+        entry = query_db("select id, title, text, category from entries where id==?", [entry_id])
+        print(entry)
+        return render_template('new_post.html', entry=dict(entry[0]))
+
+
 @app.route('/add_category', methods=['POST'])
 def add_category():
     """
@@ -194,7 +219,7 @@ def new_post():
     """
     categories = query_db("select category from categories")
     if session.get('logged_in'):
-        return render_template("new_post.html", categories=categories)
+        return render_template("new_post.html", categories=categories, entry = dict(id=0, text='', title='', category=''))
     else:
         abort(401) # Unauthorized
 
