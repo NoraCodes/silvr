@@ -2,9 +2,9 @@
 {% block body %}
 {% if session.logged_in %}
     {% if entry.id != 0 %}
-        <form action="{{ url_for('edit_entry', entry_id=entry.id) }}" method=post class=add-entry> EDIT
+        <form action="{{ url_for('edit_entry', entry_id=entry.id) }}" method=post class=add-entry>
     {% else %}
-        <form action="{{ url_for('add_entry') }}" method=post class=add-entry> ADD
+        <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
     {% endif %}
       <dl>
         <dt>Title:
@@ -18,7 +18,11 @@
         </select> <a href = {{ url_for('new_category') }}> Create Category </a>
         <dt>Text:
         <dd><textarea name=text rows=5 cols=40 value="{{ entry.text }}"></textarea>
-        <dd><input type=submit value=Share>
+          {% if entry.id != 0 %}
+              <dd><input type=submit value=Update>
+          {% else %}
+              <dd><input type=submit value=Share>
+          {% endif %}
       </dl>
     </form>
     {% else %}

@@ -154,7 +154,6 @@ def edit_entry(entry_id):
         if not session.get('logged_in'):
             abort(401)  # Unauthorized
         entry = query_db("select id, title, text, category from entries where id==?", [entry_id])
-        print(entry)
         return render_template('new_post.html', entry=dict(entry[0]))
 
 
