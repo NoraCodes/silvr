@@ -1,9 +1,6 @@
 language: python
-python:
-- "3.5"
+python: "3.5"
 
-install:
-- pip install -r require
+install: pip install -r require
 
-script:
-python3 silvr_tests.py
+script: python3 silvr_tests.py
