@@ -10,6 +10,8 @@ DEBUG = True  # Are we in debug mode? CHANGE this once you're done customizing -
 USERNAME = 'admin' # Username for logging in
 PASSWORD = 'default' # Password for logging in. CHANGE THIS.
 
+SECRET_KEY = 'dev key' # You also need to CHANGE this.
+
 TITLE = 'Silvr' # This is the title, displayed at the top of the application
 
 from time import strftime
