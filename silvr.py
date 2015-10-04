@@ -100,8 +100,17 @@ def inject_config():
     Inject the configuration
     """
     navbar = app.config['NAVBAR_ADDL']
-    title = app.config['TITLE']
     copyright = app.config['COPYRIGHT']
+
+    if app.config['DEBUG'] is True:
+        title = app.config['TITLE']
+        copyright = app.config['COPYRIGHT'] + " (Development Mode)"
+    else:
+        if app.config['PASSWORD'] == 'default':
+            title = "CHANGE PASSWORD FROM DEFAULT" # This is intended to make people change their password.
+        else:
+            title = app.config['TITLE']
+
     return dict(navbar=navbar, title=title, copyright=copyright)
 
 
