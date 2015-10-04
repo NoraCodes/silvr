@@ -1,12 +1,14 @@
 # Configuration for silvr blog
+# Copy this file to config.py and CHANGE the database setting and password.
+# Really do change the password, please.
 import logging
 
-DATABASE = '/home/sws/projects/silvr/silvr.db' # CHANGE this to point to your database.
+DATABASE = '/fully/qualified/path/to/silvr.db' # CHANGE this to point to your database.
 SCHEMA = 'schema.sql'
-DEBUG = True  # Are we in debug mode?
-SECRET_KEY = 'dev key'
+DEBUG = True  # Are we in debug mode? CHANGE this once you're done customizing.
+SECRET_KEY = 'dev key' # Also CHANGE this.
 USERNAME = 'admin'
-PASSWORD = 'default'  # TODO: Make this not awful
+PASSWORD = 'default'
 
 LOGLEVEL = logging.DEBUG # I suggest setting this to logging.WARNING
 
