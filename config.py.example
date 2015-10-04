@@ -10,7 +10,7 @@ SECRET_KEY = 'dev key' # Also CHANGE this.
 USERNAME = 'admin'
 PASSWORD = 'default'
 
-LOGLEVEL = logging.DEBUG # I suggest setting this to logging.WARNING
+LOGLEVEL = logging.WARNING
 
 TITLE = 'Silvr'
 COPYRIGHT = 'Copyright (C) Leo Tindall 2015'
