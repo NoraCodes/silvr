@@ -1,21 +1,44 @@
-# Configuration for silvr blog
+# Configuration for silvr microblog
+# Executed in a Python interpreter, so the Gandalf treatment applies: "Keep it secret, keep it safe."
 # Copy this file to config.py and CHANGE the database setting and password.
 # Really do change the password, please.
-import logging
 
-DATABASE = '/fully/qualified/path/to/silvr.db' # CHANGE this to point to your database.
-SCHEMA = 'schema.sql'
-DEBUG = True  # Are we in debug mode? CHANGE this once you're done customizing.
-SECRET_KEY = 'dev key' # Also CHANGE this.
-USERNAME = 'admin'
-PASSWORD = 'default'
+####### User Configuration. Feel free to change this stuff.
 
-LOGLEVEL = logging.WARNING
+DEBUG = True  # Are we in debug mode? CHANGE this once you're done customizing - this EXPOSES A PYTHON CONSOLE if True
 
-TITLE = 'Silvr'
-COPYRIGHT = 'Copyright (C) Leo Tindall 2015'
+USERNAME = 'admin' # Username for logging in
+PASSWORD = 'default' # Password for logging in. CHANGE THIS.
 
+TITLE = 'Silvr' # This is the title, displayed at the top of the application
+
+from time import strftime
+COPYRIGHT = 'Copyright (C) ' + strftime('%Y')  # The copyright string, shown at the bottom of the application
+                                                    # Ex. 'Copyright (C) 2015'
 LATEST_FIRST = True  # If True, display the latest posts first; if False, displays in chronological order
-LATEST_FIRST_IN_CATEGORIES = LATEST_FIRST  # Same as above for results in /category/* pages
-DATETIME = "%Y/%m/%d %H:%M:%S" # The datetime format string for new entries. Default: yyyy/mm/dd hh:mm:ss
-NAVBAR_ADDL = [('http://silverwingedseraph.net', 'Main Site')]  # List of tuples of (URI, display name) to be added to the navbar
+LATEST_FIRST_IN_CATEGORIES = True  # Same as above for results in /category/* pages
+
+DATETIME = "%Y/%m/%d %H:%M:%S" # The datetime format string for new entries. Ex: 2015/10/04 12:13:05
+
+NAVBAR_ADDL = [('http://example.com', 'Example Link 1'), # List of tuples of (URI, display name) for the navbar
+               ('http://example.com', 'Example Link 2')]
+
+
+################## DO NOT MODIFY THINGS BELOW THIS LEVEL UNLESS YOU HAVE A REALLY GOOD REASON ##########################
+
+# Database configuration
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
+
+DATABASE = current_dir + 'silvr.db' # This will cause the system to use ./silvr.db
+SCHEMA = current_dir + 'schema.sql'
+
+# Logging
+import logging
+LOGLEVEL = ""
+
+if DEBUG is True:
+    LOGLEVEL = logging.DEBUG # In debug mode, use debug logging level
+else:
+    LOGLEVEL = logging.WARNING # In production mode, use warning logging level
